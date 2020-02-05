@@ -1,12 +1,12 @@
 const proxy = require('http-proxy-middleware')
 
 module.exports = function(app) {
- app.use(proxy('/api', 
+ app.use(proxy("/api", 
    { 
-     target: "https://www.jianshu.com", 
+     target: "https://www.jianshu.com/users/recommended", 
      changeOrigin:true,
      pathRewrite: {
-                 "^/api": ""
-             }
+         '^/api':'https://www.jianshu.com/users/recommended',
+     }
    }))
 }

@@ -7,10 +7,21 @@ import { HeaderWrapper, Logo, HeaderWrapperAside, HeaderWrapperMiddle,
 import { CSSTransition } from 'react-transition-group'
 import { connect } from 'react-redux'
 import  * as actionCreators  from './store/actionCreators.js'
-import axios from 'axios'
+
 
 class Header extends React.Component {
     render() {
+        const { focused,  handleInputFocus, handleInputBlur, list, page, mouseIn,
+            handleMouseEnter, handleMouseLeave, handleChangePage, totalPage
+        } = this.props 
+        const newList = list.toJS()
+        const pageList = []
+
+        for(let i = (page - 1) * 4; i < page*4; i++){
+            pageList.push(
+                <SearchInfoContentItem key={i}>{newList[i]}</SearchInfoContentItem>
+            )
+        }
         return (
             <HeaderWrapper>
                 <HeaderWrapperAside>
@@ -29,30 +40,29 @@ class Header extends React.Component {
                     </HeaderWrapperMiddleItem>
                     <SearchWrapper>
                     <CSSTransition
-                     in = {this.props.focused}
+                     in = {focused}
                      timeout = {200}
                      classNames = 'slide'
                     >
                     <NavSearch
-                      onFocus={this.props.handleInputFocus}
-                      onBlur = {this.props.handleInputBlur}
+                      onFocus={handleInputFocus}
+                      onBlur = {handleInputBlur}
                     >
                     </NavSearch>
                     </CSSTransition>
-                    <i className={this.props.focused ? 'focused iconfont' : 'iconfont'} 
+                    <i className={focused ? 'focused iconfont zoom' : 'iconfont zoom'} 
                     style={{fontSize:`15px`}}>&#xe64d;</i>
-                    <SearchInfo show = {this.props.focused}>
+                    <SearchInfo show = {focused || mouseIn} 
+                      onMouseEnter={handleMouseEnter}
+                      onMouseLeave={handleMouseLeave}
+                    >
                         <SearchInfoTitle>
                             <div>热门搜索</div>
-                            <div>换一批</div>
+                            <i className='iconfont' ref={(icon)=>{this.spinIcon = icon}} >&#xe851;</i>
+                            <div onClick={() => handleChangePage(page, totalPage, this.spinIcon)}>换一批</div>
                         </SearchInfoTitle>
                         <SearchInfoContent>
-                        <SearchInfoContentItem>12qqqq</SearchInfoContentItem>
-                        <SearchInfoContentItem>1qqq3</SearchInfoContentItem>
-                        <SearchInfoContentItem>1q4</SearchInfoContentItem>
-                        <SearchInfoContentItem>15</SearchInfoContentItem>
-                        <SearchInfoContentItem>16</SearchInfoContentItem>
-                        <SearchInfoContentItem>17</SearchInfoContentItem>
+                        {pageList}  
                         </SearchInfoContent>
                     </SearchInfo>
                     </SearchWrapper>
@@ -86,23 +96,15 @@ class Header extends React.Component {
             </HeaderWrapper>
         )
     }
-
-    componentDidMount() {
-        axios.get('/api/users/recommended',{
-            params: {
-                seen_ids:'9988193%2C301940%2C7133325%2C3730494%2C3950651',
-                count:5,
-                only_unfollowed:true
-            }
-        })
-      .then((msg)=>{console.log(msg)})
-      .catch(()=>{console.log('error')})
-      }
 }
 
 const mapStateToProps = (state) => {
     return{
-      focused: state.get('header').get('focused')
+      focused: state.get('header').get('focused'),
+      list: state.getIn(['header', 'list']),
+      page: state.getIn(['header','page']),
+      mouseIn: state.getIn(['header','mouseIn']),
+      totalPage: state.getIn(['header','totalPage'])
     }
 }
 
@@ -111,11 +113,35 @@ const mapDispathToProps = (dispatch) => {
         handleInputFocus()  {
             const action = actionCreators.searchFocus()
             dispatch(action)
+            dispatch(actionCreators.getList())
         },
     
         handleInputBlur() {
             const action = actionCreators.searchBlur()
             dispatch(action)
+        },
+
+        handleMouseEnter() {
+            dispatch(actionCreators.mouseEnter())
+        },
+
+        handleMouseLeave() {
+            dispatch(actionCreators.mouseLeave())
+        },
+
+        handleChangePage(page, totalPage, spin) {
+            if(page<totalPage) {
+                dispatch(actionCreators.pageChange(page+1))
+            }else{
+                dispatch(actionCreators.pageChange(1))
+            }
+            let originAngle = spin.style.transform.replace(/[^0-9]/ig,'')
+            if(originAngle){
+                originAngle = parseInt(originAngle, 10)
+            }else{
+                originAngle = 0;
+            }
+            spin.style.transform = 'rotate(' + (originAngle + 180) +'deg)'
         }
     }
 }

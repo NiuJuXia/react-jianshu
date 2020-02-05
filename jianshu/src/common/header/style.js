@@ -2,10 +2,13 @@ import styled from 'styled-components';
 import logoPic from '../../statics/logo.png';
 
 export const HeaderWrapper = styled.div`
-  position: realtive;
+  position: fixed;
   height: 56px;
   border-bottom: 1px solid #f0f0f0;
   display: flex;
+  width:100%;
+  background:#fff;
+  z-index:1;
 `
 
 export const HeaderWrapperAside = styled.div`
@@ -19,6 +22,7 @@ export const HeaderWrapperAsideRight = styled.div`
   display: flex;
   justify-content:center;
   align-items:center;
+  overflow:hidden;
 `
 
 export const HeaderWrapperMiddle = styled.div`
@@ -55,7 +59,7 @@ export const HeaderWrapperMiddleItem = styled.div`
 `
 
 export const Span = styled.span`
-  line-height: ${props => props.lineh ? props.lineh : '26px'}
+  line-height: ${props => props.lineh ? props.lineh : '26px'};
 `
 
 export const Logo = styled.a.attrs({
@@ -98,12 +102,13 @@ export const Button = styled.div`
   font-size: 15px;
   color: ${props => props.type ? '#ea6f5a': '#fff'};
   background-color: ${props => props.type ? 'transparent': '#ea6f5a'};
+  overflow:hidden;
 `
 
 export const SearchWrapper = styled.div`
  display: flex;
  position: relative;
- .iconfont {
+ .zoom {
      position: absolute;
      right: 5px;
      bottom: 12px;
@@ -141,9 +146,11 @@ export const SearchInfo = styled.div`
   padding: 0 20px;
   box-shadow: 0 0 8px rgba(0,0,0,.2);
   display: ${props => props.show ? '': 'none'};
+  background:#fff;
 `
 
 export const SearchInfoTitle = styled.div`
+  position:relative;
   margin-top: 20px;
   margin-bottom: 15px;
   line-height: 20px;
@@ -153,6 +160,14 @@ export const SearchInfoTitle = styled.div`
   justify-content: center;
   &>:first-child{
     padding-right:100px;
+  }
+  cursor: pointer;
+  .iconfont{
+    display: block;
+    transition: all .2s ease-in;
+    font-size:12px;
+    margin-right:2px;
+    transform-origin:center center;
   }
 `
 
